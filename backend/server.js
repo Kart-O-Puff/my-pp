@@ -1,18 +1,16 @@
 require('dotenv').config()
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const authRoutes = require('../backend/routes/auth');
-const saveProfileRoutes = require('../backend/routes/saveProfile')
 
 const app = express()
 app.use(cors());
 app.use(express.json());
 
 // ROUTES
-app.use('/api', authRoutes)
-app.use('/api', saveProfileRoutes)
+app.use('/api', require('./routes/auth'))
+app.use('/api/performers', require('./routes/performer'))
+app.use('/api/admin', require('./routes/admin'));
 
 // REQUESTS
 const PORT = process.env.PORT;

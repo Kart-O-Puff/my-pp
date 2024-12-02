@@ -7,10 +7,11 @@ import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { culturalgroups, campuses, departments, programs } from '../../../data/registrationValues';
-import { useState } from 'react';
+import { culturalgroups, campuses, departments, programs, fetchRegistrationValues } from '../../../data/registrationValues';
+import { useState, useEffect, useContext } from 'react';
 import { Divider, Typography } from '@mui/material';
 import axios from 'axios'; // Import Axios for API calls
+import { UserContext } from '../../../_context/UserContext';
 
 const FormGrid = styled(Grid)(() => ({
   display: 'flex',
@@ -18,6 +19,7 @@ const FormGrid = styled(Grid)(() => ({
 }));
 
 export default function PersonalInformation() {
+  const { user } = useContext(UserContext); // Get user from context
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [formData, setFormData] = useState({
@@ -31,12 +33,41 @@ export default function PersonalInformation() {
     srCode: '',
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchRegistrationValues();
+      // Fetch user details if user is available
+      if (user) {
+        try {
+          const response = await axios.get(`http://localhost:4000/api/performers/details/${user._id}`);
+          const data = response.data.performerDetails;
+          setFormData({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            culturalGroup: data.culturalGroup._id,
+            campus: data.campus._id,
+            department: data.department._id,
+            program: data.program._id,
+            srCode: data.srCode,
+          });
+          setSelectedDepartment(data.department);
+          setFilteredPrograms(programs[data.department.label] || []);
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
   // Filter the programs based on the selected department
   const handleDepartmentChange = (event, value) => {
     setSelectedDepartment(value);
     if (value) {
       setFilteredPrograms(programs[value.label] || []);
-      setFormData({ ...formData, department: value.label });
+      setFormData({ ...formData, department: value._id });
     } else {
       setFilteredPrograms([]);
     }
@@ -49,6 +80,7 @@ export default function PersonalInformation() {
   };
 
   const handleSave = async () => {
+    console.log("Form Data:", formData);
     try {
       const response = await axios.post('/save-profile', formData, {
         headers: {
@@ -56,7 +88,6 @@ export default function PersonalInformation() {
         },
       });
       alert(response.data.message || 'Profile saved successfully!');
-      console.log("Token:", localStorage.getItem('token'))
     } catch (error) {
       console.error('Error saving profile:', error.response?.data || error.message);
       alert(error.response?.data.message || 'An error occurred while saving the profile.');
@@ -127,7 +158,9 @@ export default function PersonalInformation() {
             size="small"
             disablePortal
             options={culturalgroups}
-            onChange={(event, value) => setFormData({ ...formData, culturalGroup: value })}
+            getOptionLabel={(option) => option.label}
+            value={culturalgroups.find(group => group._id === formData.culturalGroup) || null}
+            onChange={(event, value) => setFormData({ ...formData, culturalGroup: value ? value._id : '' })}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormGrid>
@@ -142,7 +175,9 @@ export default function PersonalInformation() {
             size="small"
             disablePortal
             options={campuses}
-            onChange={(event, value) => setFormData({ ...formData, campus: value })}
+            getOptionLabel={(option) => option.label}
+            value={campuses.find(campus => campus._id === formData.campus) || null}
+            onChange={(event, value) => setFormData({ ...formData, campus: value ? value._id : '' })}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormGrid>
@@ -157,6 +192,8 @@ export default function PersonalInformation() {
             size="small"
             disablePortal
             options={departments}
+            getOptionLabel={(option) => option.label}
+            value={departments.find(department => department._id === formData.department) || null}
             onChange={handleDepartmentChange}
             renderInput={(params) => <TextField {...params} />}
           />
@@ -172,7 +209,9 @@ export default function PersonalInformation() {
             size="small"
             disablePortal
             options={filteredPrograms}
-            onChange={(event, value) => setFormData({ ...formData, program: value })}
+            getOptionLabel={(option) => option.label}
+            value={filteredPrograms.find(program => program._id === formData.program) || null}
+            onChange={(event, value) => setFormData({ ...formData, program: value ? value._id : '' })}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormGrid>

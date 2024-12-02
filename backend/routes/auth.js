@@ -30,7 +30,7 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
 
 // Login route
 router.post('/sign-in', async (req, res) => {
-    const { email, password} = req.body;
+    const { email, password } = req.body;
 
     try {
       const user = await User.findOne({ email });
@@ -49,7 +49,7 @@ router.post('/sign-in', async (req, res) => {
       const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
       
 
-      res.status(200).json({ token, message: 'Login successful' });
+      res.status(200).json({ token, user: { _id: user._id, role: user.role }, message: 'Login successful' });
       console.log("Login successful!");
     } 
     

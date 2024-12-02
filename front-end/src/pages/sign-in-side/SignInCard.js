@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -11,6 +11,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'; // Add the useNavigate hook
+import { UserContext } from '../../_context/UserContext';
+
 
 import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from './CustomIcons';
@@ -40,6 +42,7 @@ export default function SignInCard() {
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
   const [open, setOpen] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
+  const { setUser } = useContext(UserContext);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -75,6 +78,7 @@ export default function SignInCard() {
       if (response.ok) {
         const result = await response.json();
         console.log('Login successful:', result);
+        setUser(result.user);
         navigate('/profile'); // Navigate to dashboard upon successful login
       } else {
         const error = await response.json();
