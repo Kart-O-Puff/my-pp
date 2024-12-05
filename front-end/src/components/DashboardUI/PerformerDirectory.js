@@ -46,7 +46,7 @@ export default function DataTable() {
   return (
     <Box sx={{ width: '90%' }}>
       <h1>Performers Directory</h1>
-      <Paper sx={{ minHeight: 400, width: '100%' }}>
+      <Paper >
       <DataGrid
         rows={rows}
         columns={columns}

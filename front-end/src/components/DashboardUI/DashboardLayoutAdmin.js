@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
@@ -11,6 +10,7 @@ import { List } from '@mui/icons-material';
 import { Forms } from '../../pages/Forms';
 import EnhancedTable from './PerformerDirectory';
 import { DashboardAdmin } from './DashboardAdmin';
+import { useNavigate } from "react-router-dom";
         
 const NAVIGATION = [
   {
@@ -49,7 +49,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }) {
+function DashboardPageSwitcher({ pathname }) {
   const currentNavItem = NAVIGATION.find(item => pathname.includes(item.segment));
 
   const ContentComponent = currentNavItem?.component || (() => (
@@ -59,7 +59,7 @@ function DemoPageContent({ pathname }) {
   return (
     <Box
       sx={{
-        py: 4,
+        py: 2,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -71,37 +71,38 @@ function DemoPageContent({ pathname }) {
   );
 }
 
-DemoPageContent.propTypes = {
-  pathname: PropTypes.string.isRequired,
-};
-
-function DashboardLayoutAccount(props) {
-  const { window } = props;
-
+function DashboardLayoutAdmin() {
+  const navigate = useNavigate();
+  
+  const initialUserData = JSON.parse(localStorage.getItem('userData')) || {
+    name: '',
+    email: '',
+    image: '',
+  };
+  
   const [session, setSession] = React.useState({
-    user: {
-      name: 'Billymer Salamat',
-      email: 'billysalamat@gmail.com',
-      image: 'https://avatars.githubusercontent.com/u/19550456',
-    },
+    user: initialUserData
   });
 
   const authentication = React.useMemo(() => {
     return {
-      signIn: () => {
+      signIn: (userData) => {
         setSession({
           user: {
-            name: 'Billymer Salamat',
-            email: 'billysalamat@gmail.com',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
+            name: userData.name,
+            email: userData.email,
+            image: userData.image || '',
           },
         });
+        localStorage.setItem('userData', JSON.stringify(userData));
       },
       signOut: () => {
         setSession(null);
+        localStorage.removeItem('authToken');
+        navigate('/sign-in');
       },
     };
-  }, []);
+  }, [navigate]);
 
   const [pathname, setPathname] = React.useState('/dashboard');
 
@@ -113,9 +114,6 @@ function DashboardLayoutAccount(props) {
     };
   }, [pathname]);
 
-  // Remove this const when copying and pasting into your project.
-  const demoWindow = window !== undefined ? window() : undefined;
-
   return (
     // preview-start
     <AppProvider
@@ -124,22 +122,13 @@ function DashboardLayoutAccount(props) {
       navigation={NAVIGATION}
       router={router}
       theme={demoTheme}
-      window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DashboardPageSwitcher pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end
   );
 }
 
-DashboardLayoutAccount.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default DashboardLayoutAccount;
+export default DashboardLayoutAdmin;
