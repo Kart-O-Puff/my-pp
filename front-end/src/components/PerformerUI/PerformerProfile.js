@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import {
   Grid,
   Typography,
@@ -13,12 +14,7 @@ import {
   Card,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import {
-  culturalgroups,
-  campuses,
-  departments,
-  programs,
-} from "../../data/registrationValues.js";
+import { UserContext } from "../../_context/UserContext";
 
 // Styled components for consistent UI styling
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -40,18 +36,42 @@ const DisplayField = styled("div")(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   textAlign: "left",
   paddingLeft: theme.spacing(2),
-  color: "#333", // Ensure font color is visible
+  color: "#333",
 }));
 
-export default function PerformerProfile() {
-  // State to toggle edit mode
-  const [editable, setEditable] = useState(false);
+// Constants for dropdown options
+const culturalgroups = [];
+const campuses = [];
+const departments = [];
+const programs = {};
 
-  // States for dropdowns and user data
+// Function to fetch registration values
+export const fetchRegistrationValues = async () => {
+  try {
+    const response = await axios.get('http://localhost:4000/api/performers/registration-values');
+    const data = response.data;
+
+    // Clear existing data to avoid duplicates
+    culturalgroups.length = 0;
+    campuses.length = 0;
+    departments.length = 0;
+    Object.keys(programs).forEach(key => delete programs[key]);
+
+    // Update the exported constants
+    culturalgroups.push(...data.culturalgroups);
+    campuses.push(...data.campuses);
+    departments.push(...data.departments);
+    Object.assign(programs, data.programs);
+  } catch (error) {
+    console.error('Error fetching registration values:', error);
+  }
+};
+
+export default function PerformerProfile() {
+  const { user } = useContext(UserContext); // Use user context to get user
+  const [editable, setEditable] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
-
-  // State to hold saved user data (non-editable mode)
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -63,28 +83,44 @@ export default function PerformerProfile() {
     program: "",
     srCode: "",
   });
-
-  // State to hold editable data (temporary changes during edit mode)
   const [editableUserData, setEditableUserData] = useState({ ...userData });
+  const [achievements, setAchievements] = useState([]);
+  const [editableAchievements, setEditableAchievements] = useState([]);
 
-  // State for achievements
-  const [achievements, setAchievements] = useState([]); // List of achievements
-  const [editableAchievements, setEditableAchievements] = useState([]); // Editable version of achievements
-
-  // Fetch user profile data from backend
   const fetchProfile = async () => {
     try {
-      const email = "user@example.com"; // Replace with the logged-in user's email
-      const response = await fetch(`http://localhost:4000/api/profile?email=${email}`);
+      const response = await axios.get(`http://localhost:4000/api/performers/${user._id}`);
 
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data); // Set the saved data
-        setEditableUserData(data); // Sync editable data
-        setSelectedDepartment(data.department); // Update dependent dropdowns
-        setSelectedProgram(data.program);
-        setAchievements(data.achievements || []); // Load achievements
-        setEditableAchievements(data.achievements || []);
+      if (response.status === 200) {
+        const data = response.data;
+        console.log("Profile fetched:", data);
+        const performerDetails = data.performerDetails[0] || {};
+        setUserData({
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          email: data.user.email,
+          image: data.user.image,
+          culturalGroup: performerDetails.culturalGroup?.label || "",
+          campus: performerDetails.campus?.label || "",
+          department: performerDetails.department?.label || "",
+          program: performerDetails.program?.label || "",
+          srCode: performerDetails.srCode || "",
+        });
+        setEditableUserData({
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          email: data.user.email,
+          image: data.user.image,
+          culturalGroup: performerDetails.culturalGroup?._id || "",
+          campus: performerDetails.campus?._id || "",
+          department: performerDetails.department?._id || "",
+          program: performerDetails.program?._id || "",
+          srCode: performerDetails.srCode || "",
+        });
+        setSelectedDepartment(performerDetails.department?._id || "");
+        setSelectedProgram(performerDetails.program?._id || "");
+        setAchievements(data.performerAchievements || []);
+        setEditableAchievements(data.performerAchievements || []);
       } else {
         console.error("Failed to fetch profile");
       }
@@ -93,22 +129,29 @@ export default function PerformerProfile() {
     }
   };
 
-  // Save updated profile data to backend
   const saveProfile = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...editableUserData, achievements: editableAchievements }),
+      const response = await axios.put(`http://localhost:4000/api/performers/${user._id}`, {
+        ...editableUserData,
+        achievements: editableAchievements,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data); // Update displayed data with the response
-        setAchievements(data.achievements || []); // Update achievements
-        setEditable(false); // Exit edit mode
+      if (response.status === 200) {
+        const data = response.data;
+        const performerDetails = data.performerDetails[0] || {};
+        setUserData({
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          email: data.user.email,
+          image: data.user.image,
+          culturalGroup: performerDetails.culturalGroup?.label || "",
+          campus: performerDetails.campus?.label || "",
+          department: performerDetails.department?.label || "",
+          program: performerDetails.program?.label || "",
+          srCode: performerDetails.srCode || "",
+        });
+        setAchievements(data.performerAchievements || []);
+        setEditable(false);
         console.log("Profile updated:", data);
       } else {
         console.error("Failed to save profile");
@@ -118,36 +161,34 @@ export default function PerformerProfile() {
     }
   };
 
-  // Handle changes in form inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditableUserData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    if (name === "department") {
+      setSelectedDepartment(value);
+      setSelectedProgram(""); // Reset program when department changes
+    }
   };
 
-  // Handle changes in achievements
   const handleAchievementChange = (index, field, value) => {
     const updatedAchievements = [...editableAchievements];
     updatedAchievements[index][field] = value;
     setEditableAchievements(updatedAchievements);
   };
 
-  // Add a new achievement
   const addAchievement = () => {
-    setEditableAchievements([...
-      editableAchievements,
-      { awardName: "", eventName: "", date: "" },
-    ]);
+    setEditableAchievements([...editableAchievements, { title: "", description: "", date: "" }]);
   };
 
-  // Fetch user profile data on component mount
   useEffect(() => {
     fetchProfile();
-  }, []);
+    fetchRegistrationValues();
+  }, [user]);
 
-  // Helper function to render individual form fields
   const renderField = (label, name, options = null) => (
     <Grid item xs={12} sm={6}>
       <Typography variant="subtitle2">{label}</Typography>
@@ -155,34 +196,27 @@ export default function PerformerProfile() {
         options ? (
           <FormControl fullWidth>
             <InputLabel>{label}</InputLabel>
-            <Select
-              name={name}
-              value={editableUserData[name]}
-              onChange={handleInputChange}
-            >
+            <Select name={name} value={editableUserData[name]} onChange={handleInputChange}>
               {options.map((option, index) => (
-                <MenuItem key={index} value={option.label}>
+                <MenuItem key={index} value={option._id}>
                   {option.label}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         ) : (
-          <TextField
-            fullWidth
-            variant="outlined"
-            name={name}
-            value={editableUserData[name]}
-            onChange={handleInputChange}
-          />
+          <TextField fullWidth variant="outlined" name={name} value={editableUserData[name]} onChange={handleInputChange} />
         )
       ) : (
-        <DisplayField>{userData[name] || "N/A"}</DisplayField>
+        <DisplayField>
+          {options
+            ? options.find(option => option._id === userData[name])?.label || "N/A"
+            : userData[name] || "N/A"}
+        </DisplayField>
       )}
     </Grid>
   );
 
-  // Render achievements section
   const renderAchievements = () => (
     <StyledCard>
       <Typography variant="h6">Achievements</Typography>
@@ -193,22 +227,18 @@ export default function PerformerProfile() {
             <Grid container spacing={2} key={index}>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  label="Award Name"
+                  label="Title"
                   fullWidth
-                  value={achievement.awardName}
-                  onChange={(e) =>
-                    handleAchievementChange(index, "awardName", e.target.value)
-                  }
+                  value={achievement.title}
+                  onChange={(e) => handleAchievementChange(index, "title", e.target.value)}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  label="Event Name"
+                  label="Description"
                   fullWidth
-                  value={achievement.eventName}
-                  onChange={(e) =>
-                    handleAchievementChange(index, "eventName", e.target.value)
-                  }
+                  value={achievement.description}
+                  onChange={(e) => handleAchievementChange(index, "description", e.target.value)}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -218,18 +248,12 @@ export default function PerformerProfile() {
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={achievement.date}
-                  onChange={(e) =>
-                    handleAchievementChange(index, "date", e.target.value)
-                  }
+                  onChange={(e) => handleAchievementChange(index, "date", e.target.value)}
                 />
               </Grid>
             </Grid>
           ))}
-          <Button
-            variant="outlined"
-            sx={{ marginTop: 2 }}
-            onClick={addAchievement}
-          >
+          <Button variant="outlined" sx={{ marginTop: 2 }} onClick={addAchievement}>
             Add Achievement
           </Button>
         </>
@@ -237,8 +261,8 @@ export default function PerformerProfile() {
         achievements.length > 0 ? (
           achievements.map((achievement, index) => (
             <DisplayField key={index}>
-              <strong>Award Name:</strong> {achievement.awardName || "N/A"} <br />
-              <strong>Event Name:</strong> {achievement.eventName || "N/A"} <br />
+              <strong>Title:</strong> {achievement.title || "N/A"} <br />
+              <strong>Description:</strong> {achievement.description || "N/A"} <br />
               <strong>Date:</strong> {achievement.date || "N/A"}
             </DisplayField>
           ))
@@ -251,7 +275,6 @@ export default function PerformerProfile() {
 
   return (
     <Grid container spacing={3} padding={3}>
-      {/* Profile Header */}
       <Grid item xs={12}>
         <ProfileHeader>
           <Avatar
@@ -270,7 +293,7 @@ export default function PerformerProfile() {
             variant="outlined"
             sx={{ marginTop: 2 }}
             onClick={() => {
-              if (editable) setEditableUserData(userData); // Revert changes if canceled
+              if (editable) setEditableUserData(userData);
               setEditable(!editable);
             }}
           >
@@ -279,7 +302,6 @@ export default function PerformerProfile() {
         </ProfileHeader>
       </Grid>
 
-      {/* Profile Details */}
       <Grid item xs={12}>
         <StyledCard>
           <Typography variant="h6">Profile Details</Typography>
@@ -294,30 +316,20 @@ export default function PerformerProfile() {
             {renderField("Department", "department", departments)}
             {renderField("Program", "program", programs[selectedDepartment] || [])}
           </Grid>
-
-         
         </StyledCard>
       </Grid>
 
-      {/* Achievements Section */}
       <Grid item xs={12}>
         {renderAchievements()}
-
       </Grid>
 
-      {/* Save Button */}
-{editable && (
-  <Grid item xs={12} container justifyContent="center" alignItems="center">
-    <Button
-      variant="contained"
-      color="primary"
-      sx={{ marginTop: 3 }}
-      onClick={saveProfile}
-    >
-      Save
-    </Button>
-  </Grid>
-)}
+      {editable && (
+        <Grid item xs={12} container justifyContent="center" alignItems="center">
+          <Button variant="contained" color="primary" sx={{ marginTop: 3 }} onClick={saveProfile}>
+            Save
+          </Button>
+        </Grid>
+      )}
     </Grid>
   );
 }
