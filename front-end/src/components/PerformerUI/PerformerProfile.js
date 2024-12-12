@@ -301,7 +301,10 @@ export default function PerformerProfile() {
                     <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
                       {achievement.title}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="subtitle1">
+                      {achievement.date}
+                    </Typography>
+                    <Typography variant="body">
                       {achievement.description}
                     </Typography>
                   </div>
