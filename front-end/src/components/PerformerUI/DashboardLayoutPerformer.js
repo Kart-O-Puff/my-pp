@@ -1,4 +1,6 @@
-import * as React from 'react';
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
@@ -10,6 +12,8 @@ import { Forms } from '../../pages/Forms';
 import PerformerProfile from './PerformerProfile';
 import WelcomeDialog from './components/WelcomeDialog';
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+
         
 const NAVIGATION = [
   {
@@ -66,35 +70,24 @@ function DashboardPageSwitcher({ pathname }) {
 
 function DashboardLayoutPerformer() {
   const navigate = useNavigate();
-  
-  const initialUserData = JSON.parse(localStorage.getItem('userData')) || {
-    name: '',
-    email: '',
-    image: '',
-  };
-  
-  const [session, setSession] = React.useState({
-    user: initialUserData
-  });
+  const [session, setSession] = useState({ user: null });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('authToken'); // Ensure you're authenticated
+        const userId = jwtDecode(token).userId; // Decode JWT to get user ID
 
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: (userData) => {
-        setSession({
-          user: {
-            name: userData.name,
-            email: userData.email,
-            image: userData.image || '',
-          },
+        const response = await axios.get(`http://localhost:4000/api/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        localStorage.setItem('userData', JSON.stringify(userData));
-      },
-      signOut: () => {
-        setSession(null);
-        localStorage.removeItem('authToken');
-        navigate('/sign-in');
-      },
+        setSession({ user: response.data });
+      } catch (error) {
+        console.error('Failed to fetch user data:', error.message);
+        navigate('/sign-in'); // Redirect to sign-in if session fails
+      }
     };
+
+    fetchUserData();
   }, [navigate]);
 
   const [pathname, setPathname] = React.useState('/dashboard');
@@ -111,7 +104,13 @@ function DashboardLayoutPerformer() {
     // preview-start
     <AppProvider
       session={session}
-      authentication={authentication}
+      authentication={{
+        signOut: () => {
+          setSession({ user: null });
+          localStorage.removeItem('authToken');
+          navigate('/sign-in');
+        },
+      }}
       navigation={NAVIGATION}
       router={router}
       theme={demoTheme}
@@ -121,7 +120,7 @@ function DashboardLayoutPerformer() {
       }}
     >
       <DashboardLayout>
-      <WelcomeDialog />
+        <WelcomeDialog />
         <DashboardPageSwitcher pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

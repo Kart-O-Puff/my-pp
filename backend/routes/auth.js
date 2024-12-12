@@ -47,6 +47,20 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
   }
 });
 
+// Fetch User Data by ID
+router.get('/user/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password'); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 // Login route
 router.post('/sign-in', async (req, res) => {
     const { email, password } = req.body;

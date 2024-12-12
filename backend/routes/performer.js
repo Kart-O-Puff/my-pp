@@ -196,6 +196,25 @@ router.get('/:userId', async (req, res) => {
 			}
 });
 
+
+// Fetch performer's profile
+router.get('/profile', async (req, res) => {
+	try {
+	  const userId = req.user.id; // Assuming userId is in the authenticated user's token
+	  const user = await User.findById(userId).select('-password'); // Exclude the password
+  
+	  if (!user) {
+		return res.status(404).json({ message: 'User not found' });
+	  }
+  
+	  res.status(200).json(user);
+	} catch (error) {
+	  console.error(error);
+	  res.status(500).json({ message: 'Server error' });
+	}
+  });
+
+
 // Save performer's profile
 router.put('/:userId', async (req, res) => {
 	const { userId } = req.params;
