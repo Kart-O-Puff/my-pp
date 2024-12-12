@@ -56,8 +56,6 @@ export const fetchRegistrationValues = async () => {
     const response = await axios.get('http://localhost:4000/api/performers/registration-values');
     const data = response.data;
 
-    console.log(data);
-    
     // Clear existing data to avoid duplicates
     culturalgroups.length = 0;
     campuses.length = 0;
@@ -68,7 +66,7 @@ export const fetchRegistrationValues = async () => {
     culturalgroups.push(...data.culturalgroups);
     campuses.push(...data.campuses);
     departments.push(...data.departments);
-    Object.assign(programs, data.programs);
+    Object.assign(programs, data.programsByDepartment);
   } catch (error) {
     console.error('Error fetching registration values:', error);
   }
@@ -79,7 +77,7 @@ export default function PerformerProfile() {
   const [editable, setEditable] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
-  const [filteredPrograms, setFilteredPrograms] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -108,10 +106,10 @@ export default function PerformerProfile() {
           lastName: data.user.lastName,
           email: data.user.email,
           image: data.user.image,
-          culturalGroup: performerDetails.culturalGroup?.label || "",
-          campus: performerDetails.campus?.label || "",
-          department: performerDetails.department?.label || "",
-          program: performerDetails.program?.label || "",
+          culturalGroup: performerDetails.culturalGroup?._id || "",
+          campus: performerDetails.campus?._id || "",
+          department: performerDetails.department?._id || "",
+          program: performerDetails.program?._id || "",
           srCode: performerDetails.srCode || "",
         });
         setEditableUserData({
@@ -127,7 +125,6 @@ export default function PerformerProfile() {
         });
         setSelectedDepartment(performerDetails.department?._id || "");
         setSelectedProgram(performerDetails.program?._id || "");
-        setFilteredPrograms(programs[performerDetails.department?._id] || []);
         setAchievements(data.performerAchievements || []);
         setEditableAchievements(data.performerAchievements || []);
       } else {
@@ -148,16 +145,17 @@ export default function PerformerProfile() {
       if (response.status === 200) {
         const data = response.data;
         const performerDetails = data.performerDetails[0] || {};
+        console.log("Profile updated:", data);
         setUserData({
           firstName: data.user.firstName,
           lastName: data.user.lastName,
           email: data.user.email,
           image: data.user.image,
-          culturalGroup: performerDetails.culturalGroup?.label || "",
-          campus: performerDetails.campus?.label || "",
-          department: performerDetails.department?.label || "",
-          program: performerDetails.program?.label || "",
-          srCode: performerDetails.srCode || "",
+          culturalGroup: data.performerDetails.culturalGroup || "",
+          campus: data.performerDetails.campus || "",
+          department: data.performerDetails.department || "",
+          program: data.performerDetails.program || "",
+          srCode: data.performerDetails.srCode || "",
         });
         setAchievements(data.performerAchievements || []);
         setEditable(false);
@@ -179,8 +177,11 @@ export default function PerformerProfile() {
 
     if (name === "department") {
       setSelectedDepartment(value);
-      const filteredPrograms = programs[value] || [];
-      setFilteredPrograms(filteredPrograms);
+      const departmentLabel = departments.find(
+        (department) => department._id === value
+      )?.label;
+      const filteredPrograms = programs[departmentLabel] || [];
+      setProgramOptions(filteredPrograms);
       setEditableUserData((prevData) => ({
         ...prevData,
         program: filteredPrograms.length > 0 ? filteredPrograms[0]._id : "", // Reset program when department changes
@@ -204,20 +205,20 @@ export default function PerformerProfile() {
   };
 
   useEffect(() => {
-    fetchProfile();
     fetchRegistrationValues();
+    fetchProfile();
   }, [user]);
 
   const renderField = (label, name, options = null) => (
-    <Grid item xs={12} sm={6} >
+    <Grid item xs={12} sm={6}>
       <Typography variant="subtitle2">{label}</Typography>
       {editable ? (
         options ? (
           <FormControl fullWidth>
             <InputLabel>{label}</InputLabel>
             <Select name={name} value={editableUserData[name]} onChange={handleInputChange}>
-              {options.map((option, index) => (
-                <MenuItem key={index} value={option._id}>
+              {options.map((option) => (
+                <MenuItem key={option._id} value={option._id}>
                   {option.label}
                 </MenuItem>
               ))}
@@ -227,7 +228,7 @@ export default function PerformerProfile() {
           <TextField fullWidth variant="outlined" name={name} value={editableUserData[name]} onChange={handleInputChange} />
         )
       ) : (
-        <DisplayField >
+        <DisplayField>
           {options
             ? options.find(option => option._id === userData[name])?.label || "N/A"
             : userData[name] || "N/A"}
@@ -235,7 +236,14 @@ export default function PerformerProfile() {
       )}
     </Grid>
   );
-
+  
+  const renderProgramField = () => {
+    const departmentLabel = departments.find(dept => dept._id === userData.department)?.label;
+    const filteredPrograms = programs[departmentLabel] || [];
+  
+    return renderField("Program", "program", filteredPrograms);
+  };
+  
   const renderAchievements = () => (
     <StyledCard>
       <Typography variant="h6">Achievements</Typography>
@@ -370,7 +378,7 @@ export default function PerformerProfile() {
             {renderField("Cultural Group", "culturalGroup", culturalgroups)}
             {renderField("Campus", "campus", campuses)}
             {renderField("Department", "department", departments)}
-            {renderField("Program", "program", filteredPrograms)}
+            {renderProgramField()}
           </Grid>
         </StyledCard>
       </Grid>

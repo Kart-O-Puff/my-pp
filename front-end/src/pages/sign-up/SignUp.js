@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from './theme/getSignUpTheme';
 import TemplateFrame from './TemplateFrame';
 import { useNavigate } from 'react-router-dom'; // Added for routing
+import axios from 'axios';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -132,19 +133,14 @@ export default function SignUp() {
       lastName: document.getElementById('lastName').value,
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
+      srCode: document.getElementById('srCode').value,
     };
   
     try {
-      const response = await fetch('http://localhost:4000/api/sign-up', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axios.post('http://localhost:4000/api/sign-up', data);
   
-      if (response.ok) {
-        const result = await response.json();
+      if (response.status === 201) {
+        const result = response.data;
         console.log('User created successfully:', result);
   
         // Store user data in localStorage
@@ -156,8 +152,7 @@ export default function SignUp() {
   
         navigate('/sign-in'); // Redirect to login page on successful signup
       } else {
-        const error = await response.json();
-        console.error('Error creating user:', error.message);
+        console.error('Error creating user:', response.data.message);
       }
     } catch (error) {
       console.error('Error:', error);

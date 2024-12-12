@@ -143,7 +143,7 @@ router.get('/registration-values', async (req, res) => {
 		const campuses = await Campus.find({}, 'label');
 		const culturalgroups = await CulturalGroup.find({}, 'label');
 		const departments = await Department.find({}, 'label');
-		const programs = await Program.find({}, 'label');
+		const programs = await Program.find({}, 'label').populate('department', 'label');
 	
 		const programsByDepartment = departments.reduce((acc, department) => {
 			acc[department.label] = programs
@@ -156,7 +156,7 @@ router.get('/registration-values', async (req, res) => {
 			campuses,
 			culturalgroups,
 			departments,
-			programs,
+			programsByDepartment,
 		});
 	} catch (error) {
 		res.status(500).json({ message: error.message });
@@ -169,7 +169,7 @@ router.get('/:userId', async (req, res) => {
 
 	try {
 		// Fetch user
-		const user = await User.findById(userId);
+		const user = await User.findById(userId).select('firstName lastName email image');
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' });
 		}

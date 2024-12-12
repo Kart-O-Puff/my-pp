@@ -47,7 +47,7 @@ const PerformerDetailsSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    default: null,
+    required: true,
   },
   campus: {
     type: Schema.Types.ObjectId,
@@ -71,7 +71,8 @@ const PerformerDetailsSchema = new Schema({
   },
   srCode: {
     type: String,
-    default: null,
+    required: true,
+    unique: true,
   },
 });
 

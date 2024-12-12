@@ -22,7 +22,7 @@ const upload = multer({ storage: storage });
 
 // Signup route
 router.post('/sign-up', async (req, res) => {  // Make the function async
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, srCode } = req.body;
 
   try {
     // Check if user already exists
@@ -36,7 +36,7 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
     const newUser = new User({ firstName, lastName, email, password });
     await newUser.save();
 
-    const newDetail = new PerformerDetails({ userId: newUser._id});
+    const newDetail = new PerformerDetails({ user: newUser._id, srCode});
     await newDetail.save();
 
     res.status(201).json({ message: 'User created successfully', user: newUser });
