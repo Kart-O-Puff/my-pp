@@ -41,7 +41,7 @@ export function DashboardAdmin() {
         {awardsData.xAxis.length > 0 && (
           <Container series={awardsData.series} xAxis={awardsData.xAxis}>
             <BarPlot />
-            <ChartsXAxis label="Total Awards per Cultural Group" position="bottom" axisId="x-axis-id" />
+            <ChartsXAxis label="Total Number of Student-Performers per Cultural Group" position="bottom" axisId="x-axis-id" />
           </Container>
         )}
       </Paper>
@@ -51,7 +51,7 @@ export function DashboardAdmin() {
         {studentPerformersData.xAxis.length > 0 && (
           <Container series={studentPerformersData.series} xAxis={studentPerformersData.xAxis}>
             <BarPlot />
-            <ChartsXAxis label="Total Number of Student-Performers Per Campus" position="bottom" axisId="x-axis-id" />
+            <ChartsXAxis label="Total Number of Student-Performers per Campus" position="bottom" axisId="x-axis-id" />
           </Container>
         )}
       </Paper>

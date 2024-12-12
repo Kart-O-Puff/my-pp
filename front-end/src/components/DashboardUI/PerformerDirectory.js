@@ -14,21 +14,23 @@ export default function DataTable() {
   // Assuming you have additional column definitions (replace with your actual data)
   const columns = [
     { field: 'uiId', headerName: 'ID', width: 50 },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'srcode', headerName: 'SR-Code', type: 'string' },
-    { field: 'cgroup', headerName: 'Cultural Group', width: 150 },
+    { field: 'name', headerName: 'Name', width: 180 },
+    { field: 'srcode', headerName: 'SR-Code', type: 'string', width: 80 },
+    { field: 'cgroup', headerName: 'Cultural Group', width: 120 },
     { field: 'campus', headerName: 'Campus', type: 'string' },
     { field: 'department', headerName: 'Department', type: 'string' },
-    { field: 'program', headerName: 'Program', type: 'string', width: 180 },
+    { field: 'program', headerName: 'Program', type: 'string', width: 120 },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 130,
       disableClickEventBubbling: true,
       renderCell: (params) => (
+        <>
         <Button variant="text" color="error" onClick={() => handleDelete(params.row.id)}>
           <DeleteIcon />
         </Button>
+        </>
       ),
     },
   ];
@@ -53,6 +55,10 @@ export default function DataTable() {
 
     fetchPerformers();
   }, []);
+
+  const handleEdit = {
+
+  }
 
   const handleDelete = async (id) => {
     try {

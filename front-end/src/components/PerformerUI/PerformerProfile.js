@@ -279,13 +279,13 @@ export default function PerformerProfile() {
                 />
               </Grid>
               <Grid item sx={{ mb: 1 }}>
-              <Button
+                <Button
                   variant="outlined"
                   color="error"
-                  startIcon={<DeleteIcon/>}
+                  startIcon={<DeleteIcon />}
                   onClick={() => deleteAchievement(index)}
-                  >
-                    Delete
+                >
+                  Delete
                 </Button>
               </Grid>
             </Grid>
@@ -294,13 +294,11 @@ export default function PerformerProfile() {
           <Button variant="outlined" sx={{ margin: 2 }} onClick={addAchievement}>
             Add Achievement
           </Button>
-
         </>
       ) : (
-        achievements.length > 0 ? (
-          achievements.map((achievement, index) => (
-            <Grid container spacing={2} sx={{ maxWidth: '100%' }}>
-            {achievements.map((achievement, index) => (
+        <Grid container spacing={2} sx={{ maxWidth: '100%' }}>
+          {achievements.length > 0 ? (
+            achievements.map((achievement, index) => (
               <Grid item xs={12} sm={6} md={4} lg={4} key={index}>
                 <Stack
                   direction="column"
@@ -327,15 +325,15 @@ export default function PerformerProfile() {
                   </div>
                 </Stack>
               </Grid>
-            ))}
-          </Grid>
-          ))
-        ) : (
-          <Typography>No achievements added yet.</Typography>
-        )
+            ))
+          ) : (
+            <Typography>No achievements added yet.</Typography>
+          )}
+        </Grid>
       )}
     </StyledCard>
   );
+  
 
   return (
     <Grid container spacing={3} padding={3}>
