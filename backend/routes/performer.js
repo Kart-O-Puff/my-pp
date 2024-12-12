@@ -41,12 +41,13 @@ router.delete('/details/:id', async (req, res) => {
 	const { id } = req.params;
 
 	try {
+		console.log(id);
 		const performerDetails = await PerformerDetails.findByIdAndDelete(id);
 
 		if (!performerDetails) {
 			return res.status(404).json({ message: 'Performer details not found' });
 		}
-
+		
 		res.status(200).json({ message: 'Performer details deleted successfully' });
 	} catch (error) {
 		res.status(500).json({ message: error.message });

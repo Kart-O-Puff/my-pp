@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const PerformerDetails = require('../models/Performer/Details');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -54,6 +55,9 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
     // Create new user
     const newUser = new User({ firstName, lastName, email, password });
     await newUser.save();
+
+    const newDetail = new PerformerDetails({ userId: newUser._id});
+    await newDetail.save();
 
     res.status(201).json({ message: 'User created successfully', user: newUser });
   } 

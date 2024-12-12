@@ -3,23 +3,37 @@ import axios from 'axios';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
-import { Button } from '@mui/material/Button';
-
-const columns = [
-  { field: 'id', headerName: 'ID', width: 50 },
-  { field: 'name', headerName: 'Name', width: 200 },
-  { field: 'srcode', headerName: 'SR-Code', type: 'string' },
-  { field: 'cgroup', headerName: 'Cultural Group', width: 150 },
-  { field: 'campus', headerName: 'Campus', type: 'string' },
-  { field: 'department', headerName: 'Department', type: 'string' },
-  { field: 'program', headerName: 'Program', type: 'string', width: 180 },
-];
-
-const paginationModel = { page: 0, pageSize: 5 };
+import { Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function DataTable() {
   const [rows, setRows] = useState([]); // State to store API data
   const [loading, setLoading] = useState(true); // Loading state for the DataGrid
+
+  // Assuming you have additional column definitions (replace with your actual data)
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 50 },
+    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'srcode', headerName: 'SR-Code', type: 'string' },
+    { field: 'cgroup', headerName: 'Cultural Group', width: 150 },
+    { field: 'campus', headerName: 'Campus', type: 'string' },
+    { field: 'department', headerName: 'Department', type: 'string' },
+    { field: 'program', headerName: 'Program', type: 'string', width: 180 },
+    // ... Add more columns as needed
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 100,
+      disableClickEventBubbling: true,
+      renderCell: (params) => (
+        <Button variant="text" color="error" onClick={() => handleDelete(params.row.id)}>
+          <DeleteIcon />
+        </Button>
+      ),
+    },
+  ];
+
+  const paginationModel = { page: 0, pageSize: 5 };
 
   useEffect(() => {
     const fetchPerformers = async () => {
@@ -54,16 +68,13 @@ export default function DataTable() {
         <DataGrid
           rows={rows}
           columns={columns}
-          loading={loading} // DataGrid loading indicator
+          loading={loading}
           initialState={{ pagination: { paginationModel } }}
           pageSizeOptions={[5, 10, 25, 50, 100]}
           checkboxSelection
           sx={{ border: 0 }}
         />
       </Paper>
-      <Button variant="contained" color="error" onClick={() => handleDelete(selectedRowId)}>
-        Delete
-      </Button>
     </Box>
   );
 }
