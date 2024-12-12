@@ -47,31 +47,31 @@ const PerformerDetailsSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    default: null,
   },
   campus: {
     type: Schema.Types.ObjectId,
     ref: 'Campus',
-    required: true,
+    default: null,
   },
   culturalGroup: {
     type: Schema.Types.ObjectId,
     ref: 'CulturalGroup',
-    required: true,
+    default: null,
   },
   department: {
     type: Schema.Types.ObjectId,
     ref: 'Department',
-    required: true,
+    default: null,
   },
   program: {
     type: Schema.Types.ObjectId,
     ref: 'Program',
-    required: true,
+    default: null,
   },
   srCode: {
     type: String,
-    required: true,
+    default: null,
     unique: true,
   },
 });
