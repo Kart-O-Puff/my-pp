@@ -23,7 +23,6 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// Save performer's profile
 router.delete('/user/:userId', async (req, res) => {
   const { userId } = req.params;
 

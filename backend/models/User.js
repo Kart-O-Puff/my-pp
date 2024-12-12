@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     default: 'performer',
     required: true,
   },
+  image: {
+    type: String,
+    default: '',
+  },
 });
 
 userSchema.pre('save', async function(next) {

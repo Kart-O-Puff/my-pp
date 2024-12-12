@@ -4,21 +4,6 @@ const { PerformerDetails } = require('../models/Performer/Details');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose')
-const multer = require('multer');
-const path = require('path');
-
-// Setup multer storage for image files
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads/'); // Change the destination folder
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Filename will be a timestamp
-  },
-});
-
-const upload = multer({ storage: storage });
 
 // Signup route
 router.post('/sign-up', async (req, res) => {  // Make the function async
@@ -81,7 +66,6 @@ router.post('/sign-in', async (req, res) => {
 
       const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
       
-
       res.status(200).json({ token, user: { _id: user._id, role: user.role }, message: 'Login successful' });
       console.log("Login successful!");
     } 
