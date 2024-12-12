@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "start": "node server/server.js",
+        "start": "node backend/server.js",
         "heroku-postbuild": "cd backend && npm install && cd ../front-end && npm install && npm run build"
     },
     "dependencies": {
