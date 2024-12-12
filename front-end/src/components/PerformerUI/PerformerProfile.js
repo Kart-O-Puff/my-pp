@@ -56,6 +56,8 @@ export const fetchRegistrationValues = async () => {
     const response = await axios.get('http://localhost:4000/api/performers/registration-values');
     const data = response.data;
 
+    console.log(data);
+    
     // Clear existing data to avoid duplicates
     culturalgroups.length = 0;
     campuses.length = 0;
@@ -77,6 +79,7 @@ export default function PerformerProfile() {
   const [editable, setEditable] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -124,6 +127,7 @@ export default function PerformerProfile() {
         });
         setSelectedDepartment(performerDetails.department?._id || "");
         setSelectedProgram(performerDetails.program?._id || "");
+        setFilteredPrograms(programs[performerDetails.department?._id] || []);
         setAchievements(data.performerAchievements || []);
         setEditableAchievements(data.performerAchievements || []);
       } else {
@@ -175,7 +179,12 @@ export default function PerformerProfile() {
 
     if (name === "department") {
       setSelectedDepartment(value);
-      setSelectedProgram(""); // Reset program when department changes
+      const filteredPrograms = programs[value] || [];
+      setFilteredPrograms(filteredPrograms);
+      setEditableUserData((prevData) => ({
+        ...prevData,
+        program: filteredPrograms.length > 0 ? filteredPrograms[0]._id : "", // Reset program when department changes
+      }));
     }
   };
 
@@ -361,7 +370,7 @@ export default function PerformerProfile() {
             {renderField("Cultural Group", "culturalGroup", culturalgroups)}
             {renderField("Campus", "campus", campuses)}
             {renderField("Department", "department", departments)}
-            {renderField("Program", "program", programs[selectedDepartment] || [])}
+            {renderField("Program", "program", filteredPrograms)}
           </Grid>
         </StyledCard>
       </Grid>
