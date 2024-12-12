@@ -61,9 +61,6 @@ export default function DataTable() {
           sx={{ border: 0 }}
         />
       </Paper>
-      <Button variant="contained" color="error" onClick={() => handleDelete(selectedRowId)}>
-        Delete
-      </Button>
     </Box>
   );
 }

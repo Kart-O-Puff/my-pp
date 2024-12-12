@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
+import Footer from './components/Footer';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import axios from "axios";
 import {
   Grid,
   Typography,
   Button,
+  Box,
   Avatar,
   Divider,
   TextField,
@@ -12,6 +16,7 @@ import {
   FormControl,
   InputLabel,
   Card,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { UserContext } from "../../_context/UserContext";
@@ -184,13 +189,18 @@ export default function PerformerProfile() {
     setEditableAchievements([...editableAchievements, { title: "", description: "", date: "" }]);
   };
 
+  const deleteAchievement = (index) => {
+    const updatedAchievements = editableAchievements.filter((_, i) => i !== index);
+      setEditableAchievements(updatedAchievements);
+  };
+
   useEffect(() => {
     fetchProfile();
     fetchRegistrationValues();
   }, [user]);
 
   const renderField = (label, name, options = null) => (
-    <Grid item xs={12} sm={6}>
+    <Grid item xs={12} sm={6} >
       <Typography variant="subtitle2">{label}</Typography>
       {editable ? (
         options ? (
@@ -208,7 +218,7 @@ export default function PerformerProfile() {
           <TextField fullWidth variant="outlined" name={name} value={editableUserData[name]} onChange={handleInputChange} />
         )
       ) : (
-        <DisplayField>
+        <DisplayField >
           {options
             ? options.find(option => option._id === userData[name])?.label || "N/A"
             : userData[name] || "N/A"}
@@ -224,8 +234,8 @@ export default function PerformerProfile() {
       {editable ? (
         <>
           {editableAchievements.map((achievement, index) => (
-            <Grid container spacing={2} key={index}>
-              <Grid item xs={12} sm={4}>
+            <Grid container sx={{ display: 'flex', gap: 2, mt: 2 }} key={index}>
+              <Grid item sx={{ mb: 1 }}>
                 <TextField
                   label="Title"
                   fullWidth
@@ -233,7 +243,7 @@ export default function PerformerProfile() {
                   onChange={(e) => handleAchievementChange(index, "title", e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item sx={{ mb: 1 }}>
                 <TextField
                   label="Description"
                   fullWidth
@@ -241,30 +251,64 @@ export default function PerformerProfile() {
                   onChange={(e) => handleAchievementChange(index, "description", e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item sx={{ mb: 1 }}>
                 <TextField
                   label="Date"
-                  type="date"
                   fullWidth
+                  type="date"
                   InputLabelProps={{ shrink: true }}
                   value={achievement.date}
                   onChange={(e) => handleAchievementChange(index, "date", e.target.value)}
                 />
               </Grid>
+              <Grid item sx={{ mb: 1 }}>
+              <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<DeleteIcon/>}
+                  onClick={() => deleteAchievement(index)}
+                  >
+                    Delete
+                </Button>
+              </Grid>
             </Grid>
           ))}
-          <Button variant="outlined" sx={{ marginTop: 2 }} onClick={addAchievement}>
+          <Divider sx={{ my: 2 }} />
+          <Button variant="outlined" sx={{ margin: 2 }} onClick={addAchievement}>
             Add Achievement
           </Button>
+
         </>
       ) : (
         achievements.length > 0 ? (
           achievements.map((achievement, index) => (
-            <DisplayField key={index}>
-              <strong>Title:</strong> {achievement.title || "N/A"} <br />
-              <strong>Description:</strong> {achievement.description || "N/A"} <br />
-              <strong>Date:</strong> {achievement.date || "N/A"}
-            </DisplayField>
+            <Grid container spacing={2} sx={{ maxWidth: '100%' }}>
+            {achievements.map((achievement, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={4} key={index}>
+                <Stack
+                  direction="column"
+                  component={Card}
+                  spacing={1}
+                  sx={{
+                    p: 3,
+                    height: '100%',
+                  }}
+                >
+                  <Box sx={{ opacity: '50%' }}>
+                    <EmojiEventsIcon />
+                  </Box>
+                  <div>
+                    <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
+                      {achievement.title}
+                    </Typography>
+                    <Typography variant="body2">
+                      {achievement.description}
+                    </Typography>
+                  </div>
+                </Stack>
+              </Grid>
+            ))}
+          </Grid>
           ))
         ) : (
           <Typography>No achievements added yet.</Typography>
@@ -325,11 +369,12 @@ export default function PerformerProfile() {
 
       {editable && (
         <Grid item xs={12} container justifyContent="center" alignItems="center">
-          <Button variant="contained" color="primary" sx={{ marginTop: 3 }} onClick={saveProfile}>
+          <Button variant="contained" color="primary" onClick={saveProfile}>
             Save
           </Button>
         </Grid>
       )}
+      <Footer/>
     </Grid>
   );
 }
