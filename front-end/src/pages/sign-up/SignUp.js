@@ -88,7 +88,7 @@ export default function SignUp() {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const firstName = document.getElementById('firstName');
-    const lastName = document.getElementByID('lastName');
+    const lastName = document.getElementById('lastName');
 
     let isValid = true;
 
@@ -110,7 +110,7 @@ export default function SignUp() {
       setPasswordErrorMessage('');
     }
 
-    if ((!firstName.value || !lastName.value) || (!firstName.value.length || !lastName.value.length < 1)) {
+    if ((!firstName.value || !lastName.value) || (!firstName.value.length || lastName.value.length < 1)) {
       setNameError(true);
       setNameErrorMessage('Name is required.');
       isValid = false;

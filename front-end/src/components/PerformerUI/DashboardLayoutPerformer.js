@@ -10,7 +10,6 @@ import { Forms } from '../../pages/Forms';
 import PerformerProfile from './PerformerProfile';
 import WelcomeDialog from './components/WelcomeDialog';
 import { useNavigate } from "react-router-dom";
-import Footer from './components/Footer';
         
 const NAVIGATION = [
   {
@@ -116,6 +115,10 @@ function DashboardLayoutPerformer() {
       navigation={NAVIGATION}
       router={router}
       theme={demoTheme}
+      branding={{
+        logo: <img src={"/assets/OCA-Logo.png"}/>,
+        title: 'Office of Culture and Arts',
+      }}
     >
       <DashboardLayout>
       <WelcomeDialog />
@@ -125,5 +128,7 @@ function DashboardLayoutPerformer() {
     // preview-end
   );
 }
+
+
 
 export default DashboardLayoutPerformer;

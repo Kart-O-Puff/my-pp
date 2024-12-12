@@ -69,13 +69,13 @@ export default function SignInSide() {
             direction={{ xs: 'column-reverse', md: 'row' }}
             sx={{
               justifyContent: 'center',
-              gap: { xs: 6, sm: 12 },
+              gap: { xs: 6, sm: 4},
               p: { xs: 2, sm: 4 },
               m: 'auto',
             }}
           >
-            <Content />
             <SignInCard />
+            <Content />
           </Stack>
         </Stack>
       </ThemeProvider>

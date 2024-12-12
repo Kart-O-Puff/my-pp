@@ -6,7 +6,7 @@ function CustomLogo({ size = 40 }) {
     <img 
       src='../../../assets/pdf/OCA-Logo.png'  // Update with your logo's actual path
       alt="OCA Logo"
-      style={{ width: size, height: size }}  // Adjust size based on your requirement
+        // Adjust size based on your requirement
     />
   );
 }

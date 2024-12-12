@@ -122,6 +122,10 @@ function DashboardLayoutAdmin() {
       navigation={NAVIGATION}
       router={router}
       theme={demoTheme}
+      branding={{
+        logo: <img src={"/assets/OCA-Logo.png"}/>,
+        title: 'Office of Culture and Arts',
+      }}
     >
       <DashboardLayout>
         <DashboardPageSwitcher pathname={pathname} />
