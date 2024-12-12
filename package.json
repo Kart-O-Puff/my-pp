@@ -1,0 +1,11 @@
+{
+    "name": "root",
+    "version": "1.0.0",
+    "scripts": {
+      "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix front-end && npm run build --prefix front-end",
+      "start": "node backend/server.js"
+    },
+    "engines": {
+      "node": "14.x"
+    }
+  }
