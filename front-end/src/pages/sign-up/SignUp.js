@@ -13,7 +13,7 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from './theme/getSignUpTheme';
 import TemplateFrame from './TemplateFrame';
 import { useNavigate } from 'react-router-dom'; // Added for routing
-import axios from 'axios';
+import api from '../../_config/api';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -137,7 +137,7 @@ export default function SignUp() {
     };
   
     try {
-      const response = await axios.post('http://localhost:4000/api/sign-up', data);
+      const response = await api.post('/sign-up', data);
   
       if (response.status === 201) {
         const result = response.data;

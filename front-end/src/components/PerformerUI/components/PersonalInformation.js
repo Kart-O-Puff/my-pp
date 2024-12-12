@@ -10,7 +10,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { culturalgroups, campuses, departments, programs, fetchRegistrationValues } from '../../../data/registrationValues';
 import { useState, useEffect, useContext } from 'react';
 import { Divider, Typography } from '@mui/material';
-import axios from 'axios'; // Import Axios for API calls
+import api from '../../../_config/api';
 import { UserContext } from '../../../_context/UserContext';
 
 const FormGrid = styled(Grid)(() => ({
@@ -38,7 +38,7 @@ export default function PersonalInformation() {
       await fetchRegistrationValues();
       if (user) {
         try {
-          const response = await axios.get(`http://localhost:4000/api/performers/details/${user._id}`);
+          const response = await api.get(`/performers/details/${user._id}`);
           const data = response.data.performerDetails;
           
           setFormData({
@@ -84,7 +84,7 @@ export default function PersonalInformation() {
   const handleSave = async () => {
     console.log("Form Data:", formData);
     try {
-      const response = await axios.post('/save-profile', formData, {
+      const response = await api.post('/save-profile', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the JWT token
         },

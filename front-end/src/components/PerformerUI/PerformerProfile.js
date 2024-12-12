@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import Footer from './components/Footer';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import axios from "axios";
 import {
   Grid,
   Typography,
@@ -20,6 +19,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { UserContext } from "../../_context/UserContext";
+import api from "../../_config/api";
 
 // Styled components for consistent UI styling
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -53,7 +53,7 @@ const programs = {};
 // Function to fetch registration values
 export const fetchRegistrationValues = async () => {
   try {
-    const response = await axios.get('http://localhost:4000/api/performers/registration-values');
+    const response = await api.get('/performers/registration-values');
     const data = response.data;
 
     // Clear existing data to avoid duplicates
@@ -95,7 +95,7 @@ export default function PerformerProfile() {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`http://localhost:4000/api/performers/${user._id}`);
+      const response = await api.get(`/performers/${user._id}`);
 
       if (response.status === 200) {
         const data = response.data;
@@ -137,7 +137,7 @@ export default function PerformerProfile() {
 
   const saveProfile = async () => {
     try {
-      const response = await axios.put(`http://localhost:4000/api/performers/${user._id}`, {
+      const response = await api.put(`/performers/${user._id}`, {
         ...editableUserData,
         achievements: editableAchievements,
       });

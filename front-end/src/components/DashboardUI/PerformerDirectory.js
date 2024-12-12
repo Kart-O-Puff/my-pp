@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import api from '../../_config/api';
 
 export default function DataTable() {
   const [rows, setRows] = useState([]); // State to store API data
@@ -38,7 +38,7 @@ export default function DataTable() {
   useEffect(() => {
     const fetchPerformers = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/admin/users'); // Replace with your actual API URL
+        const response = await api.get('/admin/users'); // Replace with your actual API URL
         const dataWithUiId = response.data.map((item, index) => ({
           ...item,
           uiId: index + 1,
@@ -56,7 +56,7 @@ export default function DataTable() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/api/admin/user/${id}`);
+      await api.delete(`/admin/user/${id}`);
       // Update the rows state to reflect the deleted performer
       setRows(rows.filter((row) => row.id !== id));
     } catch (error) {
@@ -68,7 +68,7 @@ export default function DataTable() {
   // pedeng wala nang edit, let performer lang mag edit, just a suggestion
   // const handleEdit = async (id) => {
   //   try {
-  //     await axios.put(`/details/${id}`);
+  //     await api.put(`/details/${id}`);
   //     // Update the rows state to reflect the edited performer
   //     setRows(rows.map((row) => (row.id === id)))
   //   } catch (error) { 
