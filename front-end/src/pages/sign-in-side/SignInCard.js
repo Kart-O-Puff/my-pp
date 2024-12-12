@@ -15,9 +15,6 @@ import { UserContext } from '../../_context/UserContext';
 import api from '../../_config/api';
 
 
-import ForgotPassword from './ForgotPassword';
-
-
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -159,18 +156,6 @@ export default function SignInCard() {
           />
         </FormControl>
         <FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <Link
-              component="button"
-              type="button"
-              onClick={handleClickOpen}
-              variant="body2"
-              sx={{ alignSelf: 'baseline' }}
-            >
-              Forgot your password?
-            </Link>
-          </Box>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
@@ -190,7 +175,7 @@ export default function SignInCard() {
           control={<Checkbox value="remember" color="primary" />}
           label="Remember me"
         />
-        <ForgotPassword open={open} handleClose={handleClose} />
+        
         <Button type="submit" fullWidth variant="contained">
           Sign in
         </Button>
