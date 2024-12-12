@@ -233,6 +233,18 @@ export default function SignUp() {
                 />
               </FormControl>
               <FormControl>
+                <FormLabel htmlFor="srCode">SR Code</FormLabel>
+                <TextField
+                  required
+                  fullWidth
+                  id="srCode"
+                  placeholder="20-12345"
+                  name="srCode"
+                  autoComplete="srCode"
+                  variant="outlined"
+                />
+              </FormControl>
+              <FormControl>
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <TextField
                   required
