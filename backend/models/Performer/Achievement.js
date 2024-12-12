@@ -15,6 +15,10 @@ const PerformerAchievementSchema = new Schema({
         ref: 'User',
         required: true,
     },
+    date: {
+        type: Date,
+        required: true,
+    }
 });
 
 const PerformerAchievement = mongoose.model('PerformerAchievement', PerformerAchievementSchema);

@@ -36,11 +36,11 @@ export default function PersonalInformation() {
   useEffect(() => {
     const fetchData = async () => {
       await fetchRegistrationValues();
-      // Fetch user details if user is available
       if (user) {
         try {
           const response = await axios.get(`http://localhost:4000/api/performers/details/${user._id}`);
           const data = response.data.performerDetails;
+          
           setFormData({
             firstName: user.firstName,
             lastName: user.lastName,
@@ -51,14 +51,16 @@ export default function PersonalInformation() {
             program: data.program._id,
             srCode: data.srCode,
           });
+          
+          const initialDepartmentLabel = departments.find(dept => dept._id === data.department._id)?.label;
+          setFilteredPrograms(programs[initialDepartmentLabel] || []);
           setSelectedDepartment(data.department);
-          setFilteredPrograms(programs[data.department.label] || []);
         } catch (error) {
           console.error('Error fetching user details:', error);
         }
       }
     };
-
+  
     fetchData();
   }, [user]);
 
@@ -66,7 +68,7 @@ export default function PersonalInformation() {
   const handleDepartmentChange = (event, value) => {
     setSelectedDepartment(value);
     if (value) {
-      setFilteredPrograms(programs[value.label] || []);
+      setFilteredPrograms(program[value.label] || []);
       setFormData({ ...formData, department: value._id });
     } else {
       setFilteredPrograms([]);
@@ -199,22 +201,22 @@ export default function PersonalInformation() {
           />
         </FormGrid>
         <FormGrid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
-          <FormLabel htmlFor="program" required>
-            Program
-          </FormLabel>
-          <Autocomplete
-            id="program"
-            name="program"
-            required
-            size="small"
-            disablePortal
-            options={filteredPrograms}
-            getOptionLabel={(option) => option.label}
-            value={filteredPrograms.find(program => program._id === formData.program) || null}
-            onChange={(event, value) => setFormData({ ...formData, program: value ? value._id : '' })}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </FormGrid>
+        <FormLabel htmlFor="program" required>
+          Program
+        </FormLabel>
+        <Autocomplete
+          id="program"
+          name="program"
+          required
+          size="small"
+          disablePortal
+          options={filteredPrograms}
+          getOptionLabel={(option) => option.label}
+          value={filteredPrograms.find(program => program._id === formData.program) || null}
+          onChange={(event, value) => setFormData({ ...formData, program: value ? value._id : '' })}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </FormGrid>;
         <FormGrid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
           <FormLabel htmlFor="srcode" required>
             SR-Code

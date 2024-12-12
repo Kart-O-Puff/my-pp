@@ -72,7 +72,7 @@ router.get('/details/:userId', async (req, res) => {
 
 // Add performer's achievement
 router.post('/achievement', async (req, res) => {
-	const { userId, title, description } = req.body;
+	const { userId, title, description, date } = req.body;
 
 	try {
 		const performerAchievement = new PerformerAchievement({ user: userId, title, description });
@@ -87,10 +87,10 @@ router.post('/achievement', async (req, res) => {
 // Edit performer's achievement
 router.put('/achievement/:id', async (req, res) => {
 	const { id } = req.params;
-	const { title, description } = req.body;
+	const { title, description, date } = req.body;
 
 	try {
-		const performerAchievement = await PerformerAchievement.findByIdAndUpdate(id, { title, description }, { new: true });
+		const performerAchievement = await PerformerAchievement.findByIdAndUpdate(id, { title, description, date }, { new: true });
 
 		if (!performerAchievement) {
 			return res.status(404).json({ message: 'Performer achievement not found' });
@@ -142,7 +142,7 @@ router.get('/registration-values', async (req, res) => {
 		const campuses = await Campus.find({}, 'label');
 		const culturalgroups = await CulturalGroup.find({}, 'label');
 		const departments = await Department.find({}, 'label');
-		const programs = await Program.find({}, 'label department').populate('department', 'label');
+		const programs = await Program.find({}, 'label');
 	
 		const programsByDepartment = departments.reduce((acc, department) => {
 			acc[department.label] = programs
@@ -155,7 +155,7 @@ router.get('/registration-values', async (req, res) => {
 			campuses,
 			culturalgroups,
 			departments,
-			programs: programsByDepartment,
+			programs,
 		});
 	} catch (error) {
 		res.status(500).json({ message: error.message });

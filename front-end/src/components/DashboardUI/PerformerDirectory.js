@@ -3,6 +3,7 @@ import axios from 'axios';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
+import { Button } from '@mui/material/Button';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 50 },
@@ -17,14 +18,15 @@ const columns = [
 const paginationModel = { page: 0, pageSize: 5 };
 
 export default function DataTable() {
-  const [rows, setRows] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+  const [rows, setRows] = useState([]); // State to store API data
+  const [loading, setLoading] = useState(true); // Loading state for the DataGrid
 
   useEffect(() => {
     const fetchPerformers = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/admin/all-users');
-        setLoading(false); 
+        const response = await axios.get('http://localhost:4000/api/admin/all-users'); // Replace with your actual API URL
+        setRows(response.data);
+        setLoading(false); // Turn off loading indicator
       } catch (error) {
         console.error('Error fetching performers data:', error);
         setLoading(false);
@@ -33,6 +35,17 @@ export default function DataTable() {
 
     fetchPerformers();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/details/${id}`);
+      // Update the rows state to reflect the deleted performer
+      setRows(rows.filter((row) => row.id !== id));
+    } catch (error) {
+      console.error('Error deleting performer:', error);
+      // Handle error, e.g., show an error message to the user
+    }
+  };
 
   return (
     <Box sx={{ width: '90%' }}>
@@ -48,6 +61,9 @@ export default function DataTable() {
           sx={{ border: 0 }}
         />
       </Paper>
+      <Button variant="contained" color="error" onClick={() => handleDelete(selectedRowId)}>
+        Delete
+      </Button>
     </Box>
   );
 }
