@@ -13,7 +13,7 @@ export default function DataTable() {
 
   // Assuming you have additional column definitions (replace with your actual data)
   const columns = [
-    { field: 'id', headerName: 'ID', width: 50 },
+    { field: 'uiId', headerName: 'ID', width: 50 },
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'srcode', headerName: 'SR-Code', type: 'string' },
     { field: 'cgroup', headerName: 'Cultural Group', width: 150 },
@@ -38,8 +38,12 @@ export default function DataTable() {
   useEffect(() => {
     const fetchPerformers = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/admin/all-users'); // Replace with your actual API URL
-        setRows(response.data);
+        const response = await axios.get('http://localhost:4000/api/admin/users'); // Replace with your actual API URL
+        const dataWithUiId = response.data.map((item, index) => ({
+          ...item,
+          uiId: index + 1,
+        }));
+        setRows(dataWithUiId);
         setLoading(false); // Turn off loading indicator
       } catch (error) {
         console.error('Error fetching performers data:', error);
@@ -52,7 +56,7 @@ export default function DataTable() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/details/${id}`);
+      await axios.delete(`http://localhost:4000/api/admin/user/${id}`);
       // Update the rows state to reflect the deleted performer
       setRows(rows.filter((row) => row.id !== id));
     } catch (error) {
@@ -61,15 +65,16 @@ export default function DataTable() {
     }
   };
 
-  const handleEdit = async (id) => {
-    try {
-      await axios.put(`/details/${id}`);
-      // Update the rows state to reflect the edited performer
-      setRows(rows.map((row) => (row.id === id)))
-    } catch (error) { 
-      console.error('Error updating performer details.', error);
-    }
-  };
+  // pedeng wala nang edit, let performer lang mag edit, just a suggestion
+  // const handleEdit = async (id) => {
+  //   try {
+  //     await axios.put(`/details/${id}`);
+  //     // Update the rows state to reflect the edited performer
+  //     setRows(rows.map((row) => (row.id === id)))
+  //   } catch (error) { 
+  //     console.error('Error updating performer details.', error);
+  //   }
+  // };
 
   return (
     <Box sx={{ width: '90%' }}>

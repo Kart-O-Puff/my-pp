@@ -198,37 +198,37 @@ router.get('/:userId', async (req, res) => {
 
 // Save performer's profile
 router.put('/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const { firstName, lastName, email, image, culturalGroup, campus, department, program, srCode, achievements } = req.body;
+	const { userId } = req.params;
+	const { firstName, lastName, email, image, culturalGroup, campus, department, program, srCode, achievements } = req.body;
 
-  try {
-    // Update user details
-    const user = await User.findByIdAndUpdate(userId, { firstName, lastName, email, image }, { new: true });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+	try {
+		// Update user details
+		const user = await User.findByIdAndUpdate(userId, { firstName, lastName, email, image }, { new: true });
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
 
-    // Update performer details
-    const performerDetails = await PerformerDetails.findOneAndUpdate(
-      { user: userId },
-      { culturalGroup, campus, department, program, srCode },
-      { new: true, upsert: true } // Create if not exists
-    );
+		// Update performer details
+		const performerDetails = await PerformerDetails.findOneAndUpdate(
+			{ user: userId },
+			{ culturalGroup, campus, department, program, srCode },
+			{ new: true, upsert: true } // Create if not exists
+		);
 
-    // Update achievements
-    await PerformerAchievement.deleteMany({ user: userId });
-    const newAchievements = await PerformerAchievement.insertMany(
-      achievements.map(achievement => ({ ...achievement, user: userId }))
-    );
+		// Update achievements
+		await PerformerAchievement.deleteMany({ user: userId });
+		const newAchievements = await PerformerAchievement.insertMany(
+			achievements.map(achievement => ({ ...achievement, user: userId }))
+		);
 
-    res.status(200).json({
-      user,
-      performerDetails,
-      performerAchievements: newAchievements,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+		res.status(200).json({
+			user,
+			performerDetails,
+			performerAchievements: newAchievements,
+		});
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
 });
 
 module.exports = router;
