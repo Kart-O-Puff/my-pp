@@ -3,14 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-
 const app = express()
+
+// MIDDLEWARES
 app.use(cors());
 app.use(express.json());
 
 // ROUTES
-app.use('/api', require('./routes/auth'))
-app.use('/api/performers', require('./routes/performer'))
+app.use('/api', require('./routes/auth'));
+app.use('/api/performers', require('./routes/performer'));
 app.use('/api/admin', require('./routes/admin'));
 
 // REQUESTS

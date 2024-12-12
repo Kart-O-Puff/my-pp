@@ -210,7 +210,7 @@ export default function PerformerProfile() {
   }, [user]);
 
   const renderField = (label, name, options = null) => (
-    <Grid item xs={12} sm={6}>
+    <Grid item xs={12} sm={6} key={name}>
       <Typography variant="subtitle2">{label}</Typography>
       {editable ? (
         options ? (
@@ -298,8 +298,7 @@ export default function PerformerProfile() {
         </>
       ) : (
         achievements.length > 0 ? (
-          achievements.map((achievement, index) => (
-            <Grid container spacing={2} sx={{ maxWidth: '100%' }}>
+          <Grid container spacing={2} sx={{ maxWidth: '100%' }}>
             {achievements.map((achievement, index) => (
               <Grid item xs={12} sm={6} md={4} lg={4} key={index}>
                 <Stack
@@ -329,7 +328,6 @@ export default function PerformerProfile() {
               </Grid>
             ))}
           </Grid>
-          ))
         ) : (
           <Typography>No achievements added yet.</Typography>
         )
