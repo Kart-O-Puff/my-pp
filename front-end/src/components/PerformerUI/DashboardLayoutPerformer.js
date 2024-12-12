@@ -12,6 +12,7 @@ import PerformerProfile from './PerformerProfile';
 import WelcomeDialog from './components/WelcomeDialog';
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import api from '../../_config/api';
 
         
 const NAVIGATION = [
@@ -76,7 +77,7 @@ function DashboardLayoutPerformer() {
         const token = localStorage.getItem('authToken'); // Ensure you're authenticated
         const userId = jwtDecode(token).userId; // Decode JWT to get user ID
 
-        const response = await axios.get(`http://localhost:4000/api/user/${userId}`, {
+        const response = await api.get(`/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSession({ user: response.data });
