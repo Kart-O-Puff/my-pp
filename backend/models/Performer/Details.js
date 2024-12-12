@@ -72,7 +72,6 @@ const PerformerDetailsSchema = new Schema({
   srCode: {
     type: String,
     default: null,
-    unique: true,
   },
 });
 

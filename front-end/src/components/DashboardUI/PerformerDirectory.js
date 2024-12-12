@@ -5,6 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 export default function DataTable() {
   const [rows, setRows] = useState([]); // State to store API data
@@ -19,7 +20,6 @@ export default function DataTable() {
     { field: 'campus', headerName: 'Campus', type: 'string' },
     { field: 'department', headerName: 'Department', type: 'string' },
     { field: 'program', headerName: 'Program', type: 'string', width: 180 },
-    // ... Add more columns as needed
     {
       field: 'actions',
       headerName: 'Actions',
@@ -58,6 +58,16 @@ export default function DataTable() {
     } catch (error) {
       console.error('Error deleting performer:', error);
       // Handle error, e.g., show an error message to the user
+    }
+  };
+
+  const handleEdit = async (id) => {
+    try {
+      await axios.put(`/details/${id}`);
+      // Update the rows state to reflect the edited performer
+      setRows(rows.map((row) => (row.id === id)))
+    } catch (error) { 
+      console.error('Error updating performer details.', error);
     }
   };
 

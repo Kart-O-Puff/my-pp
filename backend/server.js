@@ -13,10 +13,6 @@ app.use('/api', require('./routes/auth'))
 app.use('/api/performers', require('./routes/performer'))
 app.use('/api/admin', require('./routes/admin'));
 
-const profileRoutes = require('../backend/models/Profile'); // Assuming the new route is in routes folder
-app.use('/api', profileRoutes);
-
-
 // REQUESTS
 const PORT = process.env.PORT;
 app.listen(process.env.PORT, () => {
