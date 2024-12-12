@@ -4,10 +4,10 @@
     "private": true,
     "scripts": {
         "start": "node backend/server.js",
-        "heroku-postbuild": "cd backend && npm install && cd ../front-end && npm install && npm run build"
+        "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix front-end && npm run build --prefix front-end",
     },
     "dependencies": {
-        "dotenv": "^16.4.5",
+        "dotenv": "^16.4.5"
     },
     "engines": {
         "node": ">=22.8.0"
