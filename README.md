@@ -1,5 +1,5 @@
 # Performer's Profile
-a profile management platform for student-performers of the Office of Culture and Arts
+a profile management platform for student-performers of the BatStateU Office of Culture and Arts
 
 ## Client: Dr. LUTHER JOSE O. EROA (Head of Culture and Arts - Alangilan Campus)
 
@@ -23,12 +23,12 @@ run "npm install" to install app dependencies
 ### See the Demo Web App here [https://agile-plateau-34472-f0d63abe7a30.herokuapp.com/]
 
 ## Credits:
-** Team VisualSync **
+**Team VisualSync**
 
-Team Lead / Backend Lead - Billymer L. Salamat
-Assistant Team Lead / QA Lead - Victor Manuel S. Dalisay
-Backend Developer - Marc Daniel A. Falic
-Frontend Lead - Febrj Yarrah M. Kalalo
-Frontend Developer - Clair A. Morastel
-
+Team Lead / Backend Lead - Billymer L. Salamat \
+Assistant Team Lead / QA Lead - Victor Manuel S. Dalisay \
+Backend Developer - Marc Daniel A. Falic \
+Frontend Lead - Febrj Yarrah M. Kalalo \
+Frontend Developer - Clair A. Morastel 
+ 
 CS-4101
