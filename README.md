@@ -1,5 +1,5 @@
 # Performer's Profile
-a profile management platform for student-performers 
+a profile management platform for student-performers of the Office of Culture and Arts
 
 ## Client: Dr. LUTHER JOSE O. EROA (Head of Culture and Arts - Alangilan Campus)
 
