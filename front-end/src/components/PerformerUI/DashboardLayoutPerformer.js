@@ -1,5 +1,5 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
@@ -9,6 +9,10 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Forms } from '../../pages/Forms';
 import PerformerProfile from './PerformerProfile';
+import WelcomeDialog from './components/WelcomeDialog';
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+
         
 const NAVIGATION = [
   {
@@ -41,7 +45,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }) {
+function DashboardPageSwitcher({ pathname }) {
   const currentNavItem = NAVIGATION.find(item => pathname.includes(item.segment));
 
   const ContentComponent = currentNavItem?.component || (() => (
@@ -51,7 +55,7 @@ function DemoPageContent({ pathname }) {
   return (
     <Box
       sx={{
-        py: 4,
+        py: 2,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -63,37 +67,27 @@ function DemoPageContent({ pathname }) {
   );
 }
 
-DemoPageContent.propTypes = {
-  pathname: PropTypes.string.isRequired,
-};
+function DashboardLayoutPerformer() {
+  const navigate = useNavigate();
+  const [session, setSession] = useState({ user: null });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('authToken'); // Ensure you're authenticated
+        const userId = jwtDecode(token).userId; // Decode JWT to get user ID
 
-function DashboardLayoutAccount(props) {
-  const { window } = props;
-
-  const [session, setSession] = React.useState({
-    user: {
-      name: 'Billymer Salamat',
-      email: 'billysalamat@gmail.com',
-      image: 'https://avatars.githubusercontent.com/u/19550456',
-    },
-  });
-
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setSession({
-          user: {
-            name: 'Billymer Salamat',
-            email: 'billysalamat@gmail.com',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
-          },
+        const response = await axios.get(`http://localhost:4000/api/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-      },
-      signOut: () => {
-        setSession(null);
-      },
+        setSession({ user: response.data });
+      } catch (error) {
+        console.error('Failed to fetch user data:', error.message);
+        navigate('/sign-in'); // Redirect to sign-in if session fails
+      }
     };
-  }, []);
+
+    fetchUserData();
+  }, [navigate]);
 
   const [pathname, setPathname] = React.useState('/dashboard');
 
@@ -105,33 +99,32 @@ function DashboardLayoutAccount(props) {
     };
   }, [pathname]);
 
-  // Remove this const when copying and pasting into your project.
-  const demoWindow = window !== undefined ? window() : undefined;
-
   return (
     // preview-start
     <AppProvider
       session={session}
-      authentication={authentication}
+      authentication={{
+        signOut: () => {
+          setSession({ user: null });
+          localStorage.removeItem('authToken');
+          navigate('/sign-in');
+        },
+      }}
       navigation={NAVIGATION}
       router={router}
       theme={demoTheme}
-      window={demoWindow}
+      branding={{
+        logo: <img src={"/assets/OCA-Logo.png"}/>,
+        title: 'Office of Culture and Arts',
+      }}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <WelcomeDialog />
+        <DashboardPageSwitcher pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end
   );
 }
 
-DashboardLayoutAccount.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default DashboardLayoutAccount;
+export default DashboardLayoutPerformer;

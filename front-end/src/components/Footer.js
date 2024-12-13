@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer>
         <p>
-            Office of Culture and Arts ©
+            Office of Culture and Arts © 
             <span>
                 {(new Date().getFullYear())}
             </span>

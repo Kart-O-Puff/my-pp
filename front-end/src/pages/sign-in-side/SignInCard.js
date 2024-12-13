@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -11,9 +11,9 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'; // Add the useNavigate hook
+import { UserContext } from '../../_context/UserContext';
+import api from '../../_config/api';
 
-import ForgotPassword from './ForgotPassword';
-import { SitemarkIcon } from './CustomIcons';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -40,6 +40,7 @@ export default function SignInCard() {
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
   const [open, setOpen] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
+  const { setUser } = useContext(UserContext);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -52,39 +53,42 @@ export default function SignInCard() {
   // Updated handleSubmit to perform the API call
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     if (!validateInputs()) {
       return; // Prevent form submission if inputs are invalid
     }
-
+  
     const data = new FormData(event.currentTarget);
-
+  
     const credentials = {
       email: data.get('email'),
       password: data.get('password'),
     };
-
+  
     try {
-      // Make API call to login
-      const response = await fetch('http://localhost:4000/api/sign-in', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      // Make API call to login using Axios
+      const response = await api.post('/sign-in', credentials);
+  
+      if (response.status === 200) {
+        const result = response.data;
         console.log('Login successful:', result);
-        navigate('/profile'); // Navigate to dashboard upon successful login
+        setUser(result.user);
+        localStorage.setItem('authToken', result.token);
+        if (result.user.role === 'admin') {
+          navigate('/admin'); // Navigate to admin dashboard upon successful login
+        } else {
+          navigate('/profile'); // Navigate to profile upon successful login
+        }
       } else {
-        const error = await response.json();
-        console.error('Login error:', error.message);
+        console.error('Login error:', response.data.message);
         // Handle login errors like invalid credentials
         setPasswordErrorMessage('Invalid email or password.');
         setPasswordError(true);
       }
     } catch (error) {
       console.error('Error:', error);
+      setPasswordErrorMessage('An error occurred. Please try again.');
+      setPasswordError(true);
     }
   };
 
@@ -118,7 +122,7 @@ export default function SignInCard() {
   return (
     <Card variant="outlined">
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-        <SitemarkIcon />
+  
       </Box>
       <Typography
         component="h1"
@@ -152,18 +156,6 @@ export default function SignInCard() {
           />
         </FormControl>
         <FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <Link
-              component="button"
-              type="button"
-              onClick={handleClickOpen}
-              variant="body2"
-              sx={{ alignSelf: 'baseline' }}
-            >
-              Forgot your password?
-            </Link>
-          </Box>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
@@ -183,7 +175,7 @@ export default function SignInCard() {
           control={<Checkbox value="remember" color="primary" />}
           label="Remember me"
         />
-        <ForgotPassword open={open} handleClose={handleClose} />
+        
         <Button type="submit" fullWidth variant="contained">
           Sign in
         </Button>

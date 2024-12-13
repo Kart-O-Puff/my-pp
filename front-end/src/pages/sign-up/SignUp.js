@@ -11,9 +11,9 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from './theme/getSignUpTheme';
-import { SitemarkIcon } from './CustomIcons';
 import TemplateFrame from './TemplateFrame';
 import { useNavigate } from 'react-router-dom'; // Added for routing
+import api from '../../_config/api';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -88,7 +88,8 @@ export default function SignUp() {
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
-    const name = document.getElementById('name');
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
 
     let isValid = true;
 
@@ -110,7 +111,7 @@ export default function SignUp() {
       setPasswordErrorMessage('');
     }
 
-    if (!name.value || name.value.length < 1) {
+    if ((!firstName.value || !lastName.value) || (!firstName.value.length || lastName.value.length < 1)) {
       setNameError(true);
       setNameErrorMessage('Name is required.');
       isValid = false;
@@ -124,36 +125,40 @@ export default function SignUp() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     if (!validateInputs()) return;
-
+  
     const data = {
-      name: document.getElementById('name').value,
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
+      srCode: document.getElementById('srCode').value,
     };
-
+  
     try {
-      const response = await fetch('http://localhost:4000/api/sign-up', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      const response = await api.post('/sign-up', data);
+  
+      if (response.status === 201) {
+        const result = response.data;
         console.log('User created successfully:', result);
+  
+        // Store user data in localStorage
+        localStorage.setItem('userData', JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+        }));
+  
         navigate('/sign-in'); // Redirect to login page on successful signup
       } else {
-        const error = await response.json();
-        console.error('Error creating user:', error.message);
+        console.error('Error creating user:', response.data.message);
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
+  
 
   return (
     <TemplateFrame
@@ -166,7 +171,7 @@ export default function SignUp() {
         <CssBaseline enableColorScheme />
         <SignUpContainer direction="column" justifyContent="space-between">
           <Card variant="outlined">
-            <SitemarkIcon />
+      
             <Typography
               component="h1"
               variant="h4"
@@ -180,14 +185,28 @@ export default function SignUp() {
               sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
             >
               <FormControl>
-                <FormLabel htmlFor="name">Full name</FormLabel>
+                <FormLabel htmlFor="firstName">First Name</FormLabel>
                 <TextField
-                  autoComplete="name"
-                  name="name"
+                  autoComplete="firstName"
+                  name="firstName"
                   required
                   fullWidth
-                  id="name"
-                  placeholder="Jon Snow"
+                  id="firstName"
+                  placeholder="Juan"
+                  error={nameError}
+                  helperText={nameErrorMessage}
+                  color={nameError ? 'error' : 'primary'}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                <TextField
+                  autoComplete="lastName"
+                  name="lastName"
+                  required
+                  fullWidth
+                  id="lastName"
+                  placeholder="Dela Cruz"
                   error={nameError}
                   helperText={nameErrorMessage}
                   color={nameError ? 'error' : 'primary'}
@@ -199,13 +218,25 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="email"
-                  placeholder="your@email.com"
+                  placeholder="20-12345@g.batstate-u.edu.ph"
                   name="email"
                   autoComplete="email"
                   variant="outlined"
                   error={emailError}
                   helperText={emailErrorMessage}
                   color={passwordError ? 'error' : 'primary'}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="srCode">SR Code</FormLabel>
+                <TextField
+                  required
+                  fullWidth
+                  id="srCode"
+                  placeholder="20-12345"
+                  name="srCode"
+                  autoComplete="srCode"
+                  variant="outlined"
                 />
               </FormControl>
               <FormControl>

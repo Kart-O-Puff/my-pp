@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 function Copyright() {
   return (
     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-      <Link color="text.secondary" href="">
+      <Link color="text.secondary" href="https://www.facebook.com/CultureandArtsBatStateU" target="blank">
         Office of Culture and Arts
       </Link>
       &nbsp;
@@ -24,12 +24,10 @@ export default function Footer() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: { xs: 4, sm: 8 },
-        py: { xs: 8, sm: 10 },
-        textAlign: { sm: 'center', md: 'left' },
+        pt: { xs: 2, sm: 2 , md: 2, lg: 2},
+        textAlign: { sm: 'center', md: 'center' },
       }}
     >
-      <h1>Footer</h1>
       <Copyright/>
     </Box>
   );

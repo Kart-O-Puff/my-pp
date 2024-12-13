@@ -3,53 +3,51 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
-import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
-import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
-
-import { SitemarkIcon } from './CustomIcons';
-
 const items = [
   {
-    icon: <SettingsSuggestRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Adaptable performance',
+    title: 'Office of The Culture and Arts',
     description:
-      'Our product effortlessly adjusts to your needs, boosting efficiency and simplifying your tasks.',
-  },
-  {
-    icon: <ConstructionRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Built to last',
-    description:
-      'Experience unmatched durability that goes above and beyond with lasting investment.',
-  },
-  {
-    icon: <ThumbUpAltRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Great user experience',
-    description:
-      'Integrate our product into your routine with an intuitive and easy-to-use interface.',
-  },
-  {
-    icon: <AutoFixHighRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Innovative functionality',
-    description:
-      'Stay ahead with features that set new standards, addressing your evolving needs better than the rest.',
+      'BatStateU Office of Culture and Arts - Performer’s Profile Management Platform ',
   },
 ];
 
 export default function Content() {
   return (
     <Stack
-      sx={{ flexDirection: 'column', alignSelf: 'center', gap: 4, maxWidth: 450 }}
+      sx={{
+        flexDirection: 'column',
+        alignSelf: 'center',
+        gap: 4,
+        maxWidth: 450,
+        alignItems: 'center', // Center-align the content
+        textAlign: 'center', // Center the text
+      }}
     >
-      <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <SitemarkIcon />
+      {/* Logo */}
+      <Box>
+        <img
+          src={"/assets/OCA-Logo.png"}
+          alt="Office of the Culture and Arts Logo"
+          style={{
+            maxWidth: '100px', // Adjust width as needed
+            height: 'auto',
+            marginBottom: '16px', // Add spacing below the logo
+          }}
+        />
       </Box>
+
+      {/* Content */}
       {items.map((item, index) => (
         <Stack key={index} direction="row" sx={{ gap: 2 }}>
           {item.icon}
           <div>
-            <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
+            <Typography
+              gutterBottom
+              sx={{
+                fontWeight: 'medium',
+                fontSize: '1.5rem', // Adjust font size
+              }}
+            >
               {item.title}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>

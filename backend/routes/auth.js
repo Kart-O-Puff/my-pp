@@ -1,12 +1,13 @@
 const express = require('express');
 const User = require('../models/User');
+const { PerformerDetails } = require('../models/Performer/Details');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // Signup route
 router.post('/sign-up', async (req, res) => {  // Make the function async
-  const { name, email, password } = req.body;
+  const { firstName, lastName, email, password, srCode } = req.body;
 
   try {
     // Check if user already exists
@@ -17,8 +18,11 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
     }
 
     // Create new user
-    const newUser = new User({ name, email, password });
+    const newUser = new User({ firstName, lastName, email, password });
     await newUser.save();
+
+    const newDetail = new PerformerDetails({ user: newUser._id, srCode});
+    await newDetail.save();
 
     res.status(201).json({ message: 'User created successfully', user: newUser });
   } 
@@ -28,9 +32,23 @@ router.post('/sign-up', async (req, res) => {  // Make the function async
   }
 });
 
+// Fetch User Data by ID
+router.get('/user/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password'); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 // Login route
 router.post('/sign-in', async (req, res) => {
-    const { email, password} = req.body;
+    const { email, password } = req.body;
 
     try {
       const user = await User.findOne({ email });
@@ -47,8 +65,8 @@ router.post('/sign-in', async (req, res) => {
       }
 
       const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-
-      res.status(200).json({ token, message: 'Login successful' });
+      
+      res.status(200).json({ token, user: { _id: user._id, role: user.role }, message: 'Login successful' });
       console.log("Login successful!");
     } 
     
